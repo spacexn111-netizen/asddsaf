@@ -86,6 +86,54 @@ function createLiveMessage(text, image, extra = {}, type = "auto", sender = null
     components: [row] 
   };
 }
+/* =========================
+      !kontrol KOMUTU
+  ========================= */
+  if (message.content === "!kontrol") {
+    if (!hasPermission(message.member)) return message.reply("❌ Bu komutu kullanmaya yetkin yok.");
+
+    try {
+      const res = await axios.get(
+        `https://kick.com/api/v2/channels/${KICK_CHANNEL}`,
+        {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+            'Accept': 'application/json'
+          }
+        }
+      );
+
+      const isLive = res.data.livestream !== null;
+      const stream = res.data.livestream;
+      const user = res.data.user;
+
+      if (isLive) {
+        const username = user?.username || KICK_CHANNEL;
+        const avatar = user?.profile_pic || DEFAULT_IMAGE;
+        let thumbnail = DEFAULT_IMAGE;
+
+        if (stream?.thumbnail?.url) {
+          thumbnail = stream.thumbnail.url.replace("{width}", "1280").replace("{height}", "720");
+        }
+
+        // createLiveMessage fonksiyonunu kullanarak mesajı hazırla
+        const messageData = createLiveMessage(
+          `🔴 Manuel Kontrol: Yayın şu an AKTİF!\n**Oyun:** ${stream?.categories?.[0]?.name || "Bilinmiyor"}\n**İzleyici:** ${stream?.viewer_count || 0}`, 
+          thumbnail, 
+          { username, avatar }, 
+          "manual", // Manuel olduğu için @everyone atmaz, sadece göndereni etiketler
+          message.author
+        );
+
+        return message.channel.send(messageData);
+      } else {
+        return message.reply("⚪ Şu an yayın kapalı gözüküyor.");
+      }
+    } catch (err) {
+      console.error(err);
+      return message.reply("❌ Kick API'sine bağlanırken bir hata oluştu (403 veya bağlantı sorunu).");
+    }
+  }
 
 /* =========================
    KICK KONTROL (403 FIX)
