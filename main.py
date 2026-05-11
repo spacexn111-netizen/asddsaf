@@ -8,7 +8,6 @@ from collections import deque
 from dotenv import load_dotenv
 
 load_dotenv()
-
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 # ─── FFmpeg ──────────────────────────────────────────────────────────────
@@ -51,11 +50,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.voice_states = True
 
-bot = commands.Bot(
-    command_prefix="!",
-    intents=intents,
-    help_command=None
-)
+bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 
 # ─── Guild State ─────────────────────────────────────────────────────────
 class GuildState:
@@ -188,7 +183,6 @@ async def play_next(guild, vc, channel=None):
 
         await channel.send(embed=embed)
 
-# ─── Events ──────────────────────────────────────────────────────────────
 @bot.event
 async def on_ready():
     print(f"✅ Bot hazır: {bot.user}")
@@ -200,7 +194,6 @@ async def on_ready():
         )
     )
 
-# ─── Commands ────────────────────────────────────────────────────────────
 @bot.command(name="play", aliases=["p"])
 async def play(ctx, *, query: str):
 
@@ -223,7 +216,7 @@ async def play(ctx, *, query: str):
         tracks = await search_tracks(query)
 
     except Exception as e:
-        return await msg.edit(content=f"❌ Hata:\n{e}")
+        return await msg.edit(content=f"❌ Hata:\\n{e}")
 
     if not tracks:
         return await msg.edit(content="❌ Sonuç bulunamadı.")
@@ -231,9 +224,7 @@ async def play(ctx, *, query: str):
     for t in tracks:
         state.queue.append(t)
 
-    await msg.edit(
-        content=f"✅ {len(tracks)} şarkı kuyruğa eklendi."
-    )
+    await msg.edit(content=f"✅ {len(tracks)} şarkı kuyruğa eklendi.")
 
     if not vc.is_playing() and not vc.is_paused():
         await play_next(ctx.guild, vc, ctx.channel)
@@ -276,60 +267,9 @@ async def stop(ctx):
 
     await ctx.message.add_reaction("⏹")
 
-@bot.command(name="queue", aliases=["q"])
-async def queue_cmd(ctx):
-    state = get_state(ctx.guild.id)
-
-    if not state.queue:
-        return await ctx.send("📭 Kuyruk boş.")
-
-    desc = "\n".join(
-        [
-            f"{i+1}. {t['title']}"
-            for i, t in enumerate(list(state.queue)[:10])
-        ]
-    )
-
-    embed = discord.Embed(
-        title="📋 Kuyruk",
-        description=desc,
-        color=0x5865F2
-    )
-
-    await ctx.send(embed=embed)
-
-@bot.command(name="volume", aliases=["vol"])
-async def volume(ctx, vol: int):
-
-    if not 1 <= vol <= 100:
-        return await ctx.send("1-100 arası gir.")
-
-    state = get_state(ctx.guild.id)
-
-    state.volume = vol / 100
-
-    vc = ctx.voice_client
-
-    if vc and vc.source:
-        vc.source.volume = state.volume
-
-    await ctx.send(f"🔊 Ses: %{vol}")
-
-@bot.command(name="loop")
-async def loop_cmd(ctx):
-    state = get_state(ctx.guild.id)
-
-    state.loop = not state.loop
-
-    await ctx.send(
-        f"🔁 Döngü {'açıldı' if state.loop else 'kapatıldı'}."
-    )
-
 @bot.command(name="leave")
 async def leave(ctx):
-
     state = get_state(ctx.guild.id)
-
     state.queue.clear()
     state.current = None
 
@@ -340,9 +280,7 @@ async def leave(ctx):
 
     await ctx.message.add_reaction("👋")
 
-# ─── Run ─────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-
     if not TOKEN:
         print("DISCORD_TOKEN yok.")
         exit(1)
