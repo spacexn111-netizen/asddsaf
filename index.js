@@ -300,7 +300,7 @@ const row = new ActionRowBuilder().addComponents(
   
   // BURAYI DEĞİŞTİR: const yerine let kullanıyoruz ve emojiyi ekliyoruz
   let msg = args.slice(2).join(" "); 
-  const hareketliKalp = "<a:heart_purple:BURAYA_EMOJI_ID_GELECEK>"; // Kendi emoji ID'ni buraya yaz
+  const hareketliKalp = "<a:Heart_purple:1503779194365280417>"; // Kendi emoji ID'ni buraya yaz
   msg = `${hareketliKalp} ${msg}`; 
 
   const logChannel = message.guild.channels.cache.get(LOG_CHANNEL_ID);
