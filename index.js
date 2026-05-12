@@ -296,6 +296,14 @@ const row = new ActionRowBuilder().addComponents(
     message.reply("❌ Hata oluştu.");
   }
 });
+ const targetId = args[1];
+  
+  // BURAYI DEĞİŞTİR: const yerine let kullanıyoruz ve emojiyi ekliyoruz
+  let msg = args.slice(2).join(" "); 
+  const hareketliKalp = "<a:heart_purple:BURAYA_EMOJI_ID_GELECEK>"; // Kendi emoji ID'ni buraya yaz
+  msg = `${hareketliKalp} ${msg}`; 
+
+  const logChannel = message.guild.channels.cache.get(LOG_CHANNEL_ID);
 
 /* =========================
    READY
